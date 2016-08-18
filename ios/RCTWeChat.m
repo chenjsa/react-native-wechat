@@ -220,23 +220,9 @@ RCT_EXPORT_METHOD(shareToSession:(NSDictionary *)data
                                        MediaTag:mediaTagName
                                        callBack:callback];
 
-        } else if ([type isEqualToString:RCTWXShareTypeImageUrl]) {
-            NSString * imageURL = aData[RCTWXShareImageUrl];
-
-            WXImageObject *imageObject = [WXImageObject object];
-            imageObject.imageUrl = imageURL;
-
-            [self shareToWeixinWithMediaMessage:aScene
-                                          Title:title
-                                    Description:description
-                                         Object:imageObject
-                                     MessageExt:messageExt
-                                  MessageAction:messageAction
-                                     ThumbImage:aThumbImage
-                                       MediaTag:mediaTagName
-                                       callBack:callback];
-
-        } else if ([type isEqualToString:RCTWXShareTypeImageFile] || [type isEqualToString:RCTWXShareTypeImageResource]) {
+        } else if ([type isEqualToString:RCTWXShareTypeImageUrl] ||
+                   [type isEqualToString:RCTWXShareTypeImageFile] ||
+                   [type isEqualToString:RCTWXShareTypeImageResource]) {
             NSURLRequest *imageRequest = [NSURLRequest requestWithURL:aData[RCTWXShareImageUrl]];
             [self.bridge.imageLoader loadImageWithURLRequest:imageRequest callback:^(NSError *error, UIImage *image) {
                 if (image == nil){
@@ -286,7 +272,8 @@ RCT_EXPORT_METHOD(shareToSession:(NSDictionary *)data
 {
     NSString *imageUrl = aData[RCTWXShareTypeThumbImageUrl];
     if (imageUrl.length && _bridge.imageLoader) {
-        NSURLRequest *imageRequest = [NSURLRequest requestWithURL:aData[RCTWXShareTypeThumbImageUrl]];
+        NSURL *url = [NSURL URLWithString:imageUrl];
+        NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
         [_bridge.imageLoader loadImageWithURLRequest:imageRequest size:CGSizeMake(100, 100) scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil completionBlock:^(NSError *error, UIImage *image) {
             [self shareToWeixinWithData:aData thumbImage:image scene:aScene callBack:aCallBack];
         }];
